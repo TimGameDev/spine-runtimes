@@ -88,6 +88,9 @@ namespace Spine.Unity.Editor {
 			if (imported.Length == 0)
 				return;
 
+			if (!initialized || !Preferences.autoImportEnabled)
+				return;
+
 			// we copy the list here to prevent nested calls to OnPostprocessAllAssets() triggering a Clear() of the list
 			// in the middle of execution.
 			var texturesWithoutMetaFileCopy = new List<string>(texturesWithoutMetaFile);
@@ -440,6 +443,11 @@ namespace Spine.Unity.Editor {
 	{
 		static string[] OnWillSaveAssets(string[] paths)
 		{
+			if (!SpineEditorUtilities.initialized || !SpineEditorUtilities.Preferences.autoImportEnabled)
+			{
+				return paths;
+			}
+
 			if (SpineEditorUtilities.Preferences.textureImporterWarning) {
 				foreach (string path in paths) {
 					if ((path != null) &&

@@ -100,6 +100,9 @@ namespace Spine.Unity.Editor {
 	#else
 		public static class Preferences {
 	#endif
+			const string AUTO_IMPORT_ENABLED_KEY = "SPINE_AUTO_IMPORT_ENABLED";
+			public static bool autoImportEnabled = SpinePreferences.AUTO_IMPORT_ENABLED;
+
 			const string DEFAULT_SCALE_KEY = "SPINE_DEFAULT_SCALE";
 			public static float defaultScale = SpinePreferences.DEFAULT_DEFAULT_SCALE;
 
@@ -180,6 +183,7 @@ namespace Spine.Unity.Editor {
 				if (preferencesLoaded)
 					return;
 
+				autoImportEnabled = EditorPrefs.GetBool(AUTO_IMPORT_ENABLED_KEY, SpinePreferences.AUTO_IMPORT_ENABLED);
 				defaultMix = EditorPrefs.GetFloat(DEFAULT_MIX_KEY, SpinePreferences.DEFAULT_DEFAULT_MIX);
 				defaultScale = EditorPrefs.GetFloat(DEFAULT_SCALE_KEY, SpinePreferences.DEFAULT_DEFAULT_SCALE);
 				defaultZSpacing = EditorPrefs.GetFloat(DEFAULT_ZSPACING_KEY, SpinePreferences.DEFAULT_DEFAULT_ZSPACING);
@@ -202,6 +206,7 @@ namespace Spine.Unity.Editor {
 
 #if NEW_PREFERENCES_SETTINGS_PROVIDER
 			public static void CopyOldToNewPreferences(ref SpinePreferences newPreferences) {
+				newPreferences.autoImportEnabled = EditorPrefs.GetBool(AUTO_IMPORT_ENABLED_KEY, SpinePreferences.AUTO_IMPORT_ENABLED);
 				newPreferences.defaultMix = EditorPrefs.GetFloat(DEFAULT_MIX_KEY, SpinePreferences.DEFAULT_DEFAULT_MIX);
 				newPreferences.defaultScale = EditorPrefs.GetFloat(DEFAULT_SCALE_KEY, SpinePreferences.DEFAULT_DEFAULT_SCALE);
 				newPreferences.defaultZSpacing = EditorPrefs.GetFloat(DEFAULT_ZSPACING_KEY, SpinePreferences.DEFAULT_DEFAULT_ZSPACING);
@@ -219,6 +224,7 @@ namespace Spine.Unity.Editor {
 			}
 
 			public static void SaveToEditorPrefs(SpinePreferences preferences) {
+				EditorPrefs.SetBool(AUTO_IMPORT_ENABLED_KEY, preferences.autoImportEnabled);
 				EditorPrefs.SetFloat(DEFAULT_MIX_KEY, preferences.defaultMix);
 				EditorPrefs.SetFloat(DEFAULT_SCALE_KEY, preferences.defaultScale);
 				EditorPrefs.SetFloat(DEFAULT_ZSPACING_KEY, preferences.defaultZSpacing);
@@ -403,6 +409,10 @@ namespace Spine.Unity.Editor {
 			if (EditorGUI.EndChangeCheck()) {
 				EditorPrefs.SetString(editorPrefsKey, currentValue);
 			}
+		}
+
+		public static void BoolPropertyField (SerializedProperty property, GUIContent label) {
+			property.boolValue = EditorGUILayout.Toggle(label, property.boolValue);
 		}
 
 		public static void FloatPropertyField (SerializedProperty property, GUIContent label, float min = float.NegativeInfinity, float max = float.PositiveInfinity) {

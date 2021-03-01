@@ -50,6 +50,9 @@ namespace Spine.Unity.Editor {
 
 		public const string SPINE_SETTINGS_ASSET_PATH = "Assets/Editor/SpineSettings.asset";
 
+		internal const bool AUTO_IMPORT_ENABLED = true;
+		public bool autoImportEnabled = AUTO_IMPORT_ENABLED;
+
 		#if SPINE_TK2D
 		internal const float DEFAULT_DEFAULT_SCALE = 1f;
 		#else
@@ -177,6 +180,17 @@ namespace Spine.Unity.Editor {
 			settings = AssetDatabase.LoadAssetAtPath<SpinePreferences>(SPINE_SETTINGS_ASSET_PATH);
 			if (settings == null)
 				settings = FindSpinePreferences();
+
+			if (settings == null)
+			{
+				//if Unity Library was deleted
+				if (System.IO.File.Exists(System.IO.Path.Combine(Application.dataPath, "..", SPINE_SETTINGS_ASSET_PATH)))
+				{
+					AssetDatabase.ImportAsset(SPINE_SETTINGS_ASSET_PATH, ImportAssetOptions.ForceUpdate | ImportAssetOptions.ForceSynchronousImport);
+					return null;
+				}
+			}
+
 			if (settings == null)
 			{
 				settings = ScriptableObject.CreateInstance<SpinePreferences>();
@@ -225,6 +239,8 @@ namespace Spine.Unity.Editor {
 				EditorGUILayout.Separator();
 				EditorGUILayout.LabelField("Auto-Import Settings", EditorStyles.boldLabel);
 				{
+					SpineEditorUtilities.BoolPropertyField(settings.FindProperty("autoImportEnabled"), new GUIContent("Is Auto Import Enabled", "Process asset automatically"));
+
 					SpineEditorUtilities.FloatPropertyField(settings.FindProperty("defaultMix"), new GUIContent("Default Mix", "The Default Mix Duration for newly imported SkeletonDataAssets."), min: 0f);
 					SpineEditorUtilities.FloatPropertyField(settings.FindProperty("defaultScale"), new GUIContent("Default SkeletonData Scale", "The Default skeleton import scale for newly imported SkeletonDataAssets."), min: 0.0000001f);
 
